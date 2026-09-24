@@ -54,12 +54,6 @@ module.exports = async (req, res) => {
       customData.setContentType(custom.content_type);
     }
 
-    if (typeof custom.placement === 'string') {
-      customData.setCustomProperties({
-        placement: custom.placement
-      });
-    }
-
     const serverEvent = new ServerEvent()
       .setEventName(eventName)
       .setEventId(eventId)

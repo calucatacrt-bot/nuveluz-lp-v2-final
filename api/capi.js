@@ -47,6 +47,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = req.body || {};
+    const testEventCode = body.test_event_code || req.query?.test_event_code;
     const eventName = body.event_name;
     const eventId = body.event_id;
 
@@ -89,6 +90,9 @@ module.exports = async (req, res) => {
     if (typeof custom.content_type === 'string') customData.content_type = custom.content_type;
     if (Object.keys(customData).length) event.custom_data = customData;
 
+    const metaPayload = { data: [event] };
+    if (testEventCode) metaPayload.test_event_code = String(testEventCode);
+
     const graphUrl = 'https://graph.facebook.com/' + META_GRAPH_VERSION + '/' +
       encodeURIComponent(pixelId) + '/events';
 
@@ -98,7 +102,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + accessToken
       },
-      body: JSON.stringify({ data: [event] })
+      body: JSON.stringify(metaPayload)
     });
 
     const metaBody = await metaResponse.json().catch(() => ({}));

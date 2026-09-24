@@ -47,7 +47,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = req.body || {};
-    const testEventCode = body.test_event_code || req.query?.test_event_code;
+    const testEventCode = req.query?.test_event_code || body.test_event_code;
     const eventName = body.event_name;
     const eventId = body.event_id;
 

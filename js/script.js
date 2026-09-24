@@ -1,6 +1,7 @@
 (() => {
   const CONTENT_NAME = 'El Código de la Primera Impresión';
   const CAPI_ENDPOINT = '/api/capi';
+  const TEST_EVENT_CODE = new URLSearchParams(window.location.search).get('test_event_code');
 
   let parameterBuilderReady = null;
 
@@ -30,7 +31,8 @@
         body: JSON.stringify({
           event_name: eventName,
           event_id: eventId,
-          custom_data: customData || {}
+          custom_data: customData || {},
+          ...(TEST_EVENT_CODE ? { test_event_code: TEST_EVENT_CODE } : {})
         })
       });
 

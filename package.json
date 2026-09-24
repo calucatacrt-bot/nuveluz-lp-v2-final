@@ -2,6 +2,6 @@
   "name": "nuveluz-lp-v2-final",
   "private": true,
   "dependencies": {
-    "facebook-nodejs-business-sdk": "26.0.1"
+    "facebook-nodejs-business-sdk": "20.0.3"
   }
 }

@@ -8,8 +8,7 @@
   function getParameterBuilderParams() {
     if (!window.clientParamBuilder) return Promise.resolve({});
     if (!parameterBuilderReady) {
-      parameterBuilderReady =
-        window.clientParamBuilder.processAndCollectAllParams();
+      parameterBuilderReady = window.clientParamBuilder.processAndCollectAllParams();
     }
     return parameterBuilderReady;
   }
@@ -46,20 +45,42 @@
 
   async function trackEvent(eventName, customData, prefix) {
     const eventId = makeEventId(prefix);
-
-    // Collect once per page flow so fbc/fbp are captured and persisted by Meta's
-    // official Parameter Builder before the server request is made.
     await getParameterBuilderParams();
 
     if (window.fbq) {
       fbq('track', eventName, customData || {}, { eventID: eventId });
     }
 
-    // The same event_id is sent server-side for Meta deduplication.
     await sendServerEvent(eventName, eventId, customData);
   }
 
-  // ViewContent represents an actual visit to the product content.
+  function revealVslCta() {
+    const cta = document.getElementById('vsl-cta');
+    if (cta) cta.classList.add('is-visible');
+  }
+
+  // Wistia Player API: reveal the CTA only during the final 12 seconds,
+  // and keep it visible after the video ends.
+  window._wq = window._wq || [];
+  window._wq.push({
+    id: 'jm4ut5o1o7',
+    onReady: function(video) {
+      const revealWindow = 12;
+
+      video.bind('secondchange', function(second) {
+        const duration = video.duration();
+        if (duration > 0 && second >= Math.floor(duration) - revealWindow) {
+          revealVslCta();
+          return video.unbind;
+        }
+      });
+
+      video.bind('end', function() {
+        revealVslCta();
+      });
+    }
+  });
+
   trackEvent('ViewContent', {
     content_name: CONTENT_NAME,
     content_type: 'product'
@@ -69,8 +90,6 @@
     el.addEventListener('click', () => {
       const placement = el.dataset.cta || 'unknown';
 
-      // This is the real checkout-intent event. It is fired once for the
-      // click that takes the visitor to the Hotmart checkout.
       trackEvent('InitiateCheckout', {
         content_name: CONTENT_NAME,
         content_type: 'product',

@@ -59,6 +59,20 @@
     if (cta) cta.classList.add('is-visible');
   }
 
+
+  let vslViewContentSent = false;
+
+  function trackVslViewContentOnce() {
+    if (vslViewContentSent) return;
+    vslViewContentSent = true;
+
+    trackEvent('ViewContent', {
+      content_name: CONTENT_NAME,
+      content_type: 'product',
+      content_source: 'vsl_play'
+    }, 'vc').catch(() => {});
+  }
+
   // Wistia Player API: reveal the CTA only during the final 12 seconds,
   // and keep it visible after the video ends.
   window._wq = window._wq || [];

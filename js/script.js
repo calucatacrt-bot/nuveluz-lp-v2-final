@@ -59,7 +59,6 @@
     if (cta) cta.classList.add('is-visible');
   }
 
-
   let vslViewContentSent = false;
 
   function trackVslViewContentOnce() {
@@ -74,7 +73,7 @@
   }
 
   // Wistia Player API: reveal the CTA only during the final 12 seconds,
-  // and keep it visible after the video ends.
+  // keep it visible after the video ends, and track ViewContent on actual play.
   window._wq = window._wq || [];
   window._wq.push({
     id: 'jm4ut5o1o7',
@@ -98,21 +97,6 @@
       });
     }
   });
-  let vslViewContentSent = false;
-
-  function trackVslViewContentOnce() {
-    if (vslViewContentSent) return;
-    vslViewContentSent = true;
-
-    trackEvent('ViewContent', {
-      content_name: CONTENT_NAME,
-      content_type: 'product',
-      content_source: 'vsl_play'
-    }, 'vc').catch(() => {});
-  }
-
-  // Wistia Player API: track ViewContent only when the VSL actually starts.
-  // This remains in the same onReady callback as the CTA timing/volume logic.
 
   document.querySelectorAll('[data-cta]').forEach((el) => {
     el.addEventListener('click', () => {

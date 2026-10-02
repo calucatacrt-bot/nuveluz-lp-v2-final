@@ -59,14 +59,28 @@
     if (cta) cta.classList.add('is-visible');
   }
 
+  let vslViewContentSent = false;
+
+  function trackVslViewContentOnce() {
+    if (vslViewContentSent) return;
+    vslViewContentSent = true;
+
+    trackEvent('ViewContent', {
+      content_name: CONTENT_NAME,
+      content_type: 'product',
+      content_source: 'vsl_play'
+    }, 'vc').catch(() => {});
+  }
+
   // Wistia Player API: reveal the CTA only during the final 12 seconds,
-  // and keep it visible after the video ends.
+  // keep it visible after the video ends, and track ViewContent on actual play.
   window._wq = window._wq || [];
   window._wq.push({
     id: 'jm4ut5o1o7',
     onReady: function(video) {
       // Keep the Wistia player volume at 100% while the volume control remains hidden.
       video.volume(1);
+      video.bind('play', trackVslViewContentOnce);
 
       const revealWindow = 12;
 
@@ -84,20 +98,17 @@
     }
   });
 
-  trackEvent('ViewContent', {
-    content_name: CONTENT_NAME,
-    content_type: 'product'
-  }, 'vc').catch(() => {});
-
   document.querySelectorAll('[data-cta]').forEach((el) => {
     el.addEventListener('click', () => {
       const placement = el.dataset.cta || 'unknown';
-
-      trackEvent('InitiateCheckout', {
+      const eventData = {
         content_name: CONTENT_NAME,
         content_type: 'product',
         placement
-      }, 'ic').catch(() => {});
+      };
+
+      trackEvent('Lead', eventData, 'lead').catch(() => {});
+      trackEvent('InitiateCheckout', eventData, 'ic').catch(() => {});
     });
   });
 })();

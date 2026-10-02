@@ -67,6 +67,7 @@
     onReady: function(video) {
       // Keep the Wistia player volume at 100% while the volume control remains hidden.
       video.volume(1);
+      video.bind('play', trackVslViewContentOnce);
 
       const revealWindow = 12;
 
@@ -96,12 +97,8 @@
     }, 'vc').catch(() => {});
   }
 
-  window._wq.push({
-    id: 'jm4ut5o1o7',
-    onReady: function(video) {
-      video.bind('play', trackVslViewContentOnce);
-    }
-  });
+  // Wistia Player API: track ViewContent only when the VSL actually starts.
+  // This remains in the same onReady callback as the CTA timing/volume logic.
 
   document.querySelectorAll('[data-cta]').forEach((el) => {
     el.addEventListener('click', () => {

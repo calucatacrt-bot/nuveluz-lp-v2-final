@@ -31,6 +31,20 @@ src="https://www.facebook.com/tr?id=1789478875584992&ev=PageView&noscript=1"/>
 <!-- End Meta Pixel Code -->
 
 <link rel="stylesheet" href="css/style.css">
+<style>
+/* Fix VSL Nuveluz - Remove branding Wistia free plan e evita vazamento */
+.wistia_embed .wistia_logo,
+.wistia_embed .w-branding,
+.wistia_embed a[href*="wistia.com"],
+.wistia_embed .wistia_embed__logo {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+</style>
 <script src="https://unpkg.com/meta-capi-param-builder-clientjs@1.3.2/dist/clientParamBuilder.bundle.js"></script>
 </head>
 

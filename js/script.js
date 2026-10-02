@@ -83,21 +83,37 @@
       });
     }
   });
+  let vslViewContentSent = false;
 
-  trackEvent('ViewContent', {
-    content_name: CONTENT_NAME,
-    content_type: 'product'
-  }, 'vc').catch(() => {});
+  function trackVslViewContentOnce() {
+    if (vslViewContentSent) return;
+    vslViewContentSent = true;
+
+    trackEvent('ViewContent', {
+      content_name: CONTENT_NAME,
+      content_type: 'product',
+      content_source: 'vsl_play'
+    }, 'vc').catch(() => {});
+  }
+
+  window._wq.push({
+    id: 'jm4ut5o1o7',
+    onReady: function(video) {
+      video.bind('play', trackVslViewContentOnce);
+    }
+  });
 
   document.querySelectorAll('[data-cta]').forEach((el) => {
     el.addEventListener('click', () => {
       const placement = el.dataset.cta || 'unknown';
-
-      trackEvent('InitiateCheckout', {
+      const eventData = {
         content_name: CONTENT_NAME,
         content_type: 'product',
         placement
-      }, 'ic').catch(() => {});
+      };
+
+      trackEvent('Lead', eventData, 'lead').catch(() => {});
+      trackEvent('InitiateCheckout', eventData, 'ic').catch(() => {});
     });
   });
 })();

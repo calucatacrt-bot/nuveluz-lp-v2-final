@@ -65,6 +65,9 @@
   window._wq.push({
     id: 'jm4ut5o1o7',
     onReady: function(video) {
+      // Keep the Wistia player volume at 100% while the volume control remains hidden.
+      video.volume(1);
+
       const revealWindow = 12;
 
       video.bind('secondchange', function(second) {

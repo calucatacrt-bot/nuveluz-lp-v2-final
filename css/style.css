@@ -31,10 +31,29 @@ a{color:inherit;text-decoration:none}
 .bonuses{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0}
 .bonuses article{display:flex;align-items:center;gap:12px;padding:14px;background:#F5F3EE;border:1px solid #050E1914;border-radius:12px;font-size:14px;font-weight:700}
 .bonuses b{display:grid;place-items:center;flex:0 0 38px;height:38px;background:#050E19;color:#C9A86A;border:1px solid #C9A86A;font:600 14px Georgia}
-.price{text-align:center;background:#050E19;color:#F5F3EE;border-radius:16px;padding:24px}
+.price{display:block;width:100%;text-align:center;background:#050E19;color:#F5F3EE;border-radius:16px;padding:24px;overflow:hidden}
 .price span{display:block;color:#bfc7d0;font-size:12px}
-.price strong{display:block;color:#C9A86A;font:600 clamp(43px,7vw,64px)/1 Georgia;margin:8px 0}
-.price small{color:#929ca8}
+.price strong{display:block;color:#C9A86A;font:600 clamp(40px,7vw,64px)/1 Georgia,"Times New Roman",serif;margin:8px 0;white-space:nowrap}
+.price small{display:block;color:#929ca8}
+.social-proof{padding:76px 0 82px}
+.cream{background:#F5F3EE}
+.section-head{text-align:center;max-width:760px;margin:0 auto 36px}
+.section-head h2{font:600 clamp(31px,4.5vw,48px)/1.1 Georgia,"Times New Roman",serif;margin:0 0 15px;color:#172033}
+.section-head p{max-width:680px;margin:0 auto;color:#596273}
+.quotes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:stretch}
+.quotes article{display:flex;flex-direction:column;min-width:0;background:#fff;border:1px solid #050E1914;border-radius:18px;padding:26px 24px 23px;box-shadow:0 14px 35px #050E190A;animation:nuveluzFloat 7s ease-in-out infinite}
+.quotes article:nth-child(2){animation-delay:-2.2s}
+.quotes article:nth-child(3){animation-delay:-4.4s}
+.avatar{display:grid;place-items:center;width:46px;height:46px;margin-bottom:17px;border-radius:50%;background:#050E19;color:#C9A86A;border:1px solid #C9A86A;font:600 20px Georgia,"Times New Roman",serif}
+.quotes article p{margin:0 0 20px;color:#465163;font:16px/1.65 Georgia,"Times New Roman",serif}
+.quotes article b{display:block;margin-top:auto;color:#172033;font-size:13px}
+.quotes article small{display:block;margin-top:3px;color:#7a8492;font-size:11px}
+.closing-line{text-align:center;margin:34px auto 0;color:#596273;font-size:15px}
+.closing-line strong{color:#172033}
+@keyframes nuveluzFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
 .guarantee{padding:72px 0}
 .guarantee-inner{text-align:center}
 .guarantee h2{font-size:clamp(36px,5vw,55px);margin:0 0 18px}
@@ -48,6 +67,10 @@ a{color:inherit;text-decoration:none}
 .foot nav{display:flex;flex-wrap:wrap;gap:12px 18px;align-content:flex-start}
 .foot nav a{font-size:11px}
 .foot nav a:hover{color:#C9A86A}
+@media(max-width:900px){
+  .quotes{grid-template-columns:1fr}
+  .quotes article{max-width:720px;width:100%;margin:0 auto}
+}
 @media(max-width:700px){
   .container{width:calc(100% - 28px)}
   .vsl-hero{padding:24px 0 42px}
@@ -57,6 +80,18 @@ a{color:inherit;text-decoration:none}
   .offer-card{padding:20px}
   .bonuses{grid-template-columns:1fr;gap:8px}
   .bonuses article{font-size:13px}
+  .price{padding:22px 14px}
+  .price strong{font-size:clamp(36px,11vw,52px);letter-spacing:-.02em}
+  .social-proof{padding:58px 0 62px}
+  .section-head{margin-bottom:28px}
+  .section-head h2{font-size:clamp(30px,8vw,40px)}
+  .quotes{gap:14px}
+  .quotes article{padding:22px 20px}
+  .quotes article p{font-size:15px}
   .guarantee{padding:58px 0}
   .foot{flex-direction:column}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .quotes article{animation:none}
 }

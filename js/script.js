@@ -116,7 +116,6 @@
         };
 
         trackEvent('AddToCart', eventData, 'atc').catch(() => {});
-        trackEvent('Lead', eventData, 'lead').catch(() => {});
       });
     });
   }

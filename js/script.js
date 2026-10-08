@@ -98,17 +98,28 @@
     }
   });
 
-  document.querySelectorAll('[data-cta]').forEach((el) => {
-    el.addEventListener('click', () => {
-      const placement = el.dataset.cta || 'unknown';
-      const eventData = {
-        content_name: CONTENT_NAME,
-        content_type: 'product',
-        placement
-      };
+  function initATCNuveluz() {
+    const ctasReais = document.querySelectorAll(
+      '[data-cta="vsl-final"], [data-cta="offer-price"]'
+    );
 
-      trackEvent('Lead', eventData, 'lead').catch(() => {});
-      trackEvent('InitiateCheckout', eventData, 'ic').catch(() => {});
+    ctasReais.forEach((el) => {
+      if (el.dataset.atcInit === 'true') return;
+      el.dataset.atcInit = 'true';
+
+      el.addEventListener('click', () => {
+        const placement = el.dataset.cta || 'unknown';
+        const eventData = {
+          content_name: CONTENT_NAME,
+          content_type: 'product',
+          placement
+        };
+
+        trackEvent('AddToCart', eventData, 'atc').catch(() => {});
+        trackEvent('Lead', eventData, 'lead').catch(() => {});
+      });
     });
-  });
+  }
+
+  initATCNuveluz();
 })();

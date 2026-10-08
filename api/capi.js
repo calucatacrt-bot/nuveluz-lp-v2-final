@@ -1,4 +1,4 @@
-const ALLOWED_EVENTS = new Set(['ViewContent', 'InitiateCheckout']);
+const ALLOWED_EVENTS = new Set(['ViewContent', 'AddToCart', 'InitiateCheckout', 'AddPaymentInfo']);
 const META_GRAPH_VERSION = 'v26.0';
 
 function json(res, status, body) {

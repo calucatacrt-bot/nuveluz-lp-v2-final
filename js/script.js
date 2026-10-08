@@ -59,17 +59,43 @@
     if (cta) cta.classList.add('is-visible');
   }
 
-  let vslViewContentSent = false;
+  // cd100b6 — ViewContent dedup por sessão.
+  // Mantém VC semântico no primeiro Play da VSL, mas impede disparos
+  // duplicados por re-render/reinicialização do player na mesma sessão.
+  const VC_SESSION_ID_KEY = 'nuveluz_vc_id';
+  const VC_SESSION_FIRED_KEY = 'nuveluz_vc_fired';
+
+  function getOrCreateVCSessionId() {
+    let id = sessionStorage.getItem(VC_SESSION_ID_KEY);
+    if (!id) {
+      id = 'vc_' + (
+        window.crypto && typeof window.crypto.randomUUID === 'function'
+          ? window.crypto.randomUUID()
+          : Date.now() + '_' + Math.random().toString(36).slice(2)
+      );
+      sessionStorage.setItem(VC_SESSION_ID_KEY, id);
+    }
+    return id;
+  }
 
   function trackVslViewContentOnce() {
-    if (vslViewContentSent) return;
-    vslViewContentSent = true;
+    if (sessionStorage.getItem(VC_SESSION_FIRED_KEY) === '1') return;
 
-    trackEvent('ViewContent', {
+    const eventId = getOrCreateVCSessionId();
+    sessionStorage.setItem(VC_SESSION_FIRED_KEY, '1');
+
+    const eventData = {
       content_name: CONTENT_NAME,
       content_type: 'product',
       content_source: 'vsl_play'
-    }, 'vc').catch(() => {});
+    };
+
+    if (window.fbq) {
+      fbq('track', 'ViewContent', eventData, { eventID: eventId });
+    }
+
+    sendServerEvent('ViewContent', eventId, eventData).catch(() => {});
+    console.log('[CAPI] ViewContent dedup', eventId);
   }
 
   // Wistia Player API: reveal the CTA only during the final 12 seconds,

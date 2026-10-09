@@ -21,13 +21,15 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 
 fbq('init', '1789478875584992');
-fbq('track', 'PageView');
-</script>
 
-<noscript>
-<img height="1" width="1" style="display:none"
-src="https://www.facebook.com/tr?id=1789478875584992&ev=PageView&noscript=1"/>
-</noscript>
+// Evita que um parâmetro de teste envie PageView de navegador em produção.
+const nuveluzHost = window.location.hostname.toLowerCase();
+const nuveluzProdHost = nuveluzHost === 'www.nuveluz.com' || nuveluzHost === 'nuveluz.com';
+const nuveluzHasTestCode = new URLSearchParams(window.location.search).has('test_event_code');
+if (!(nuveluzProdHost && nuveluzHasTestCode)) {
+  fbq('track', 'PageView');
+}
+</script>
 <!-- End Meta Pixel Code -->
 
 <link rel="stylesheet" href="css/style.css">

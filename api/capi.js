@@ -71,7 +71,7 @@ function getValidatedSource(req, body) {
 
   const host = referer.hostname.toLowerCase();
   const isProduction = PRODUCTION_HOSTS.has(host);
-  const isPreview = PREVIEW_HOSTS.has(host) || /^nuveluz-lp-v2-final-git-[a-z0-9-]+-carlos-roberto-tavares-projects\\.vercel\\.app$/.test(host) || /^nuveluz-lp-v2-final-git-[a-z0-9-]+-calucatacrt-bot\\.vercel\\.app$/.test(host);
+  const isPreview = PREVIEW_HOSTS.has(host) || /^nuveluz-lp-v2-final-[a-z0-9]+-carlos-roberto-tavares-projects\.vercel\.app$/.test(host) || /^nuveluz-lp-v2-final-git-[a-z0-9-]+-carlos-roberto-tavares-projects\.vercel\.app$/.test(host) || /^nuveluz-lp-v2-final-git-[a-z0-9-]+-calucatacrt-bot\.vercel\.app$/.test(host);
   const suppliedTestCode = Boolean(body?.test_event_code || req.query?.test_event_code);
 
   if (isProduction && suppliedTestCode) {

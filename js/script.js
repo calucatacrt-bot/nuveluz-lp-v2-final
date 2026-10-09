@@ -2,6 +2,9 @@
   const CONTENT_NAME = 'El Código de la Primera Impresión';
   const CAPI_ENDPOINT = '/api/capi';
   const TEST_EVENT_CODE = new URLSearchParams(window.location.search).get('test_event_code');
+  const PRODUCTION_HOSTS = new Set(['www.nuveluz.com', 'nuveluz.com']);
+  const IS_PRODUCTION_HOST = PRODUCTION_HOSTS.has(window.location.hostname.toLowerCase());
+  const IS_PRODUCTION_TEST_BLOCKED = IS_PRODUCTION_HOST && Boolean(TEST_EVENT_CODE);
 
   let parameterBuilderReady = null;
 
@@ -21,6 +24,11 @@
   }
 
   async function sendServerEvent(eventName, eventId, customData) {
+    if (IS_PRODUCTION_TEST_BLOCKED) {
+      console.warn('[Nuveluz] CAPI bloqueada: test_event_code en dominio de producción.');
+      return { ok: false, blocked: true };
+    }
+
     try {
       const response = await fetch(CAPI_ENDPOINT, {
         method: 'POST',
@@ -37,18 +45,26 @@
 
       if (!response.ok) {
         console.warn('Nuveluz CAPI:', response.status);
+        return { ok: false, status: response.status };
       }
+      return { ok: true, status: response.status };
     } catch (error) {
       console.warn('Nuveluz CAPI request failed:', error);
+      return { ok: false, error: 'request_failed' };
     }
   }
 
   async function trackEvent(eventName, customData, prefix) {
+    if (IS_PRODUCTION_TEST_BLOCKED) {
+      console.warn('[Nuveluz] Pixel bloqueado: test_event_code en dominio de producción.');
+      return;
+    }
+
     const eventId = makeEventId(prefix);
     await getParameterBuilderParams();
 
     if (window.fbq) {
-      fbq('track', eventName, customData || {}, { eventID: eventId });
+      window.fbq('track', eventName, customData || {}, { eventID: eventId });
     }
 
     await sendServerEvent(eventName, eventId, customData);
@@ -59,14 +75,11 @@
     if (cta) cta.classList.add('is-visible');
   }
 
-  // cd100b7 — ViewContent dedup por sessão + primeiro Play uma única vez.
-  // Mantém VC semântico no primeiro Play da VSL e impede qualquer segundo
-  // disparo mesmo se o listener/player for reinicializado na mesma sessão.
+  // ViewContent: un solo ID por sesión y solo en el primer Play de la VSL.
   const VC_SESSION_ID_KEY = 'nuveluz_vc_id';
   const VC_SESSION_FIRED_KEY = 'nuveluz_vc_fired';
 
   function getOrCreateVCSessionId() {
-    // Ler o ID existente ANTES de qualquer geração de UUID.
     const existingId = sessionStorage.getItem(VC_SESSION_ID_KEY);
     if (existingId) return existingId;
 
@@ -81,7 +94,11 @@
   }
 
   function trackVslViewContentOnce() {
-    // Trava persistente da sessão: nenhum segundo Play pode gerar outro VC.
+    if (IS_PRODUCTION_TEST_BLOCKED) {
+      console.warn('[Nuveluz] ViewContent bloqueado: test_event_code en dominio de producción.');
+      return;
+    }
+
     if (sessionStorage.getItem(VC_SESSION_FIRED_KEY) === '1') return;
 
     const eventId = getOrCreateVCSessionId();
@@ -94,23 +111,24 @@
     };
 
     if (window.fbq) {
-      fbq('track', 'ViewContent', eventData, { eventID: eventId });
+      window.fbq('track', 'ViewContent', eventData, { eventID: eventId });
     }
 
     sendServerEvent('ViewContent', eventId, eventData).catch(() => {});
     console.log('[CAPI] ViewContent dedup once', eventId);
   }
 
-  // Wistia Player API: reveal the CTA only during the final 12 seconds,
-  // keep it visible after the video ends, and track ViewContent on actual play.
+  if (IS_PRODUCTION_TEST_BLOCKED) {
+    console.error('[Nuveluz] Teste bloqueado em produção. Nenhum evento deste script será enviado.');
+  }
+
+  // Wistia: CTA no final do vídeo e ViewContent no primeiro Play real.
   window._wq = window._wq || [];
   window._wq.push({
     id: 'jm4ut5o1o7',
     onReady: function(video) {
-      // Keep the Wistia player volume at 100% while the volume control remains hidden.
       video.volume(1);
-      // Bind de Play com wrapper once:true: remove o próprio listener após o primeiro disparo.
-      // A trava em sessionStorage permanece como segunda camada de proteção.
+
       const oncePlayHandler = function() {
         video.unbind('play', oncePlayHandler);
         trackVslViewContentOnce();
@@ -118,12 +136,10 @@
       video.bind('play', oncePlayHandler);
 
       const revealWindow = 12;
-
       video.bind('secondchange', function(second) {
         const duration = video.duration();
         if (duration > 0 && second >= Math.floor(duration) - revealWindow) {
           revealVslCta();
-          return video.unbind;
         }
       });
 
@@ -149,7 +165,6 @@
           content_type: 'product',
           placement
         };
-
         trackEvent('AddToCart', eventData, 'atc').catch(() => {});
       });
     });
